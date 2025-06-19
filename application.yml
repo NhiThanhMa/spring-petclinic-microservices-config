@@ -37,7 +37,14 @@ spring.cloud.refresh.refreshable: false
 
 
 # Logging
-logging.level.org.springframework: INFO
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    console: >
+      {"timestamp":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%level","class":"%logger{36}","thread":"%thread","message":"%message","traceId":"%X{traceId}","spanId":"%X{spanId}","pid":"%pid","requestId":"%X{X-Request-ID}","app":"${app:-unknown}","host":"${HOSTNAME:-unknown}"}
 
 # Metrics
 management:
@@ -54,6 +61,14 @@ management:
     export:
       prometheus:
         enabled: true
+    tags:
+      application: ${spring.application.name}
+    # Add exemplars support for trace ID correlation
+    exemplars:
+      enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
   tracing:
     sampling:
       probability: 1
